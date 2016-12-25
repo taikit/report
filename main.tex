@@ -1,0 +1,134 @@
+% *********************************************************************
+%    2016年 学士論文
+% *********************************************************************
+\documentclass[12pt,a4paper,titlepage]{jreport}
+
+% 基本的なセット
+\usepackage{graphicx,moreverb,amsmath,amsthm,amssymb}
+
+% ソースコード掲載用
+%\usepackage{listings,jlisting,ascmac,verbatim}
+
+%\lstset{%
+%  language={HTML},
+%  % basicstyle={\footnotesize}
+%  basicstyle={\small},%
+%  identifierstyle={\small},%
+%  commentstyle={\small\itshape},%
+%  keywordstyle={\small\bfseries},%
+%  ndkeywordstyle={\small},%
+%  stringstyle={\small\ttfamily},
+%  frame={tb},
+%  % frame=trBL,
+%  breaklines=true,
+%  columns=[l]{fullflexible},%
+%  numbers=left,%
+%  xrightmargin=0zw,%
+%  xleftmargin=3zw,%
+%  numberstyle={\scriptsize},%
+%  stepnumber=1,
+%  numbersep=1zw,%
+%  lineskip=-0.5ex%
+%}
+
+\setlength{\topmargin}{5pt}
+\setlength{\oddsidemargin}{15pt}
+\setlength{\evensidemargin}{15pt}
+\setlength{\marginparwidth}{10pt}
+\setlength{\textwidth}{30em}
+\addtolength{\textwidth}{50pt}
+\addtolength{\textheight}{50pt}
+
+%------  ヘッダの飾り ------
+\makeatletter
+  \def\ps@testheadings{\let\@mkboth\markboth
+  \def\@oddfoot{\hfil \rm\thepage \hfil}\def\@evenfoot{}
+  \def\@oddhead{
+   \underline{\hbox to 140mm{\hfil\rightmark}}}%\textwidth{\hfil\rightmark}}}
+  \def\chaptermark##1{\markright {\uppercase{\ifnum \c@secnumdepth
+  >\m@ne
+  \@chapapp \ \fi ##1}}}}
+\makeatother
+
+\pagestyle{bothstyle}
+\renewcommand{\bibname}{参考文献}
+%--------------------------
+\begin{document}
+\pagenumbering{roman}
+\baselineskip 22pt
+%--------- 表紙 -----------------
+\title{
+\flushleft{\vspace{-3cm}\small{平成28年度~~卒業研究}}\\\vspace{3.5cm}
+\center{{\huge \bf 機能語に注目した\\音声合成朗読システムのための感情推定}}\vfill}
+\author{
+\rightline{東京理科大学~~理工学部~~経営工学科}\\
+\rightline{西山研究室~~7413069~~恒川~~泰輝}\\
+\rightline{}\\
+\rightline{指導教員~~~西山~~裕之}}
+\date{}
+\maketitle
+
+%--------------------------------------------------
+%     概要
+%--------------------------------------------------
+\include{abstract}
+%-----------目次---------
+\tableofcontents
+\newpage
+\listoffigures
+\newpage
+\listoftables
+%\newpage
+%---------------------------
+\newpage
+
+\newenvironment{indention}[1]{\par
+\addtolength{\leftskip}{#1}
+\begingroup}{\endgroup\par}
+
+\pagenumbering{arabic}
+%---------------------------
+
+%--------------------------------------------------
+%     第１章　序論
+%--------------------------------------------------
+\include{chapter1}
+
+%--------------------------------------------------
+%     第２章　関連研究
+%--------------------------------------------------
+%\include{chapter2}
+
+%--------------------------------------------------
+%     第３章 提案手法
+%--------------------------------------------------
+%\include{chapter3}
+
+%--------------------------------------------------
+%     第４章 実装
+%--------------------------------------------------
+%\include{chapter4}
+
+%--------------------------------------------------
+%     第５章 評価と考察
+%--------------------------------------------------
+%\include{chapter5}
+
+%--------------------------------------------------
+%     第６章 結論
+%--------------------------------------------------
+%\include{chapter6}
+
+%--------------------------------
+%     参考文献
+%--------------------------------
+%\markright{参考文献}
+%\include{reference}
+
+%--------------------------------
+%     アペンディクス
+%--------------------------------
+% \appendix
+% \include{appendix}
+
+\end{document}
