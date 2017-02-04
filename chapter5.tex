@@ -1,4 +1,117 @@
-\chapter{評価}
+\chapter{結果}
 
-本章では提案手法を具体的に実装したシステムを用いて，実験の概要と結果について述べる．
-\section{評価目的}
+\subsection{学習データ}
+\begin{table}[h]
+ \centering
+  \caption{学習データ(物語別)}
+  \vspace{0.3\baselineskip}
+  \scalebox{0.8}{
+  \begin{tabular}{|c|c|c|} \hline
+    タイトル & 文数(セリフ) & 評価確定数(セリフ) \\ \hline \hline
+    白雪姫 & 287 (90) & 258 (86)   \\ \hline
+    赤ずきんちゃん & 109 (54) & 108 (54)   \\ \hline
+    浦島太郎 & 206 (48) & 78 (26)   \\ \hline
+    ジャックと豆の木 & 206 (49) & 78 (26)   \\ \hline
+    ヘンゼルとグレーテル & 319 (114) & 260 (90)   \\ \hline\hline
+    合計 & 1096 (364) & 765 (283) \\ \hline
+  \end{tabular}
+  }
+  \label{sentence-count}
+\end{table}
+
+\begin{table}[h]
+ \centering
+  \caption{学習データ(感情別)}
+  \vspace{0.3\baselineskip}
+  \scalebox{0.90}{
+  \begin{tabular}{|c|c|c|} \hline
+    感情 & 全文 & セリフのみ  \\ \hline \hline
+    Normal & 459  & 63  \\ \hline
+    Happy & 134 & 110 \\ \hline
+    Sad & 99  & 60  \\ \hline
+    Angry & 73  & 50  \\ \hline \hline
+    合計 & 765 &  283 \\ \hline
+  \end{tabular}
+  }
+  \label{emotion-count}
+\end{table}
+
+学習データの概要を表\ref{sentence-count}と表\ref{emotion-count}に示す．
+全体で評価が確定したものは全体で69.8\%であった．
+全文とセリフのみに絞った場合の比較を行う．
+得られた学習データは表\ref{emotion-count}の通り，Normal以外の感情はセリフに多く含まれることがわかる．
+したがってセリフの感情推定の精度を上げることで全体の精度をあげることができることがわかる．
+全文にくらべセリフのみを対象とした場合はより均等に感情が別れているため分類がより難しい．
+
+\subsection{グリッドサーチ}
+\begin{table}[h]
+ \centering
+  \caption{ランダムフォレストのグリットサーチの結果}
+  \vspace{0.3\baselineskip}
+     \scalebox{0.75}{
+  \begin{tabular}{|c|c|c|c|c|} \hline
+  パラメタ名 & 全文 & \shortstack{全文\\(機能語のみ)} & セリフ & \shortstack{セリフ\\(機能語のみ)}\\ \hline \hline
+  ceriterion & entropy & entropy & entropy & entropy\\ \hline
+  min\_samples\_leaf & 12 & 8 & 3 & 8\\ \hline
+  n\_estimators & 80 & 250 & 30 & 30\\ \hline
+  max\_features & None & None & None & None\\ \hline
+  min\_samples\_split & 12 & 10 & 3 & 10\\ \hline
+ max\_depth & 17 & 20 & 20 & 15\\ \hline
+  \end{tabular}}
+  \label{gs-rf}
+\end{table}
+
+\begin{table}[h]
+ \centering
+  \caption{SVMのグリットサーチの結果}
+  \vspace{0.3\baselineskip}
+     \scalebox{0.8}{
+  \begin{tabular}{|c|c|c|c|c|} \hline
+  パラメタ名 & 全文 & \shortstack{全文\\(機能語のみ)} & セリフ & \shortstack{セリフ\\(機能語のみ)}\\ \hline \hline
+  kernel & sigmoid & sigmoid & poly & rbf\\ \hline
+  gamma & 0.001 & 0.001 & 3 & 0.001\\ \hline
+  C & 100 & 100 & 1000 & 1\\ \hline
+  \end{tabular}}
+  \label{gs-svm}
+\end{table}
+
+グリッドサーチの結果を表\ref{gs-rf}表と表\ref{gs-svm}に示す．
+それぞれの場合で値が大きく異なるパラーメタが得られる場合があった．
+
+\subsection{評価結果}
+\begin{table}[h]
+ \centering
+  \caption{ランダムフォレストでの結果}
+  \vspace{0.3\baselineskip}
+  \scalebox{0.9}{
+  \begin{tabular}{|l|c|c|c|c|} \hline
+    対象 & 正確度 & 適合率 & 再現率 & F値  \\ \hline \hline
+    全文 & 0.82 & 0.57 & 0.64 & 0.57  \\ \hline
+    全文(機能語) & 0.82 & 0.54 & 0.64 & 0.57   \\ \hline
+    セリフのみ & 0.70 & 0.37 & 0.40 & 0.37   \\ \hline
+    セリフのみ(機能語) & 0.70 & 0.35 & 0.40 & 0.34  \\ \hline
+  \end{tabular}
+  }
+  \label{res-rf}
+\end{table}
+
+\begin{table}[h]
+ \centering
+  \caption{SVMでの結果}
+  \vspace{0.3\baselineskip}
+  \scalebox{0.9}{
+  \begin{tabular}{|l|c|c|c|c|} \hline
+    対象 & 正確度 & 適合率 & 再現率 & F値  \\ \hline \hline
+    全文 & 0.82 & 0.57 & 064 & 0.59   \\ \hline
+    全文(機能語) & 0.80 & 0.36 & 0.60 &  0.45 \\ \hline
+    セリフ & 0.70 & 0.38 & 0.22 & 0.22   \\ \hline
+    セリフ(機能語) & 0.70 & 0.15 & 0.39 & 0.22   \\ \hline
+  \end{tabular}
+  }
+  \label{res-svm}
+\end{table}
+
+ランダムフォレストとSVMの結果を表\ref{res-rf}と表\ref{res-svm}に示す．
+なお(機能語)とは学習，推定時に機能語のみを用いた場合を示す．
+全体としてF値は高くない結果となった．
+特にSVMの場合はSVMでは，全文に機能語を絞らずに分類を行った場合を除く他のすべての場合で，推定が一つの感情に偏ってしまった．
