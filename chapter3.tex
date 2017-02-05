@@ -3,7 +3,7 @@
 本章では提案する手法の詳細について説明する．
 
 \section{提案手法の概要}
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics[clip,width=7.0cm]{fig/method-2.eps}
     \caption{提案手法の概要}
@@ -26,7 +26,7 @@
 したがって，内容語を排除し排除し，機能語のみで推定を行う．
 
 \subsection{前処理}
-\begin{figure}[h]
+\begin{figure}[ht]
   \begin{center}
     \includegraphics[clip,width=7.0cm]{fig/method.eps}
     \caption{前処理の手順}
@@ -46,5 +46,5 @@
 本研究では，その1つであるランダムフォレストを用いて推定を行う.
 ランダムフォレストは複数の決定木を用いて識別などを行うアンサンブル学習アルゴリズムである.
 また，精度を向上させるために，正確度を指標としてグリットサーチを用いて最適なパラメタを探索する．
-%TODO
+%TODO-me
 %本研究で調整したパラメタはの\ref{parameter}通りである.
