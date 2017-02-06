@@ -1,22 +1,55 @@
 \chapter{実験}
-
-形態素解析部にMeCab\cite{mecab}
+本章では，提案手法の有効性を確認するための評価実験について説明する.
+まず、実験環境と評価方法について述べたあと、比較実験について説明し、最後に学習パラメタについて述べる。
 
 \section{実験環境}
+\begin{table}[ht]
+  \begin{center}
+  \caption{実験のソフトウェア仕様}
+  \label{ex-software}
+  \begin{tabular}{|c|l|}
+    \hline
+    名称 & バージョン \\ \hline \hline
+    Pyton & 3.5.2 \\ \hline
+    MeCab &  0.996 \\ \hline
+    MeCab用IPA辞書 & 2.7.0 \\ \hline
+    scikit-learn & 0.17.1 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
 
-\section{比較実験}
-\subsection{セリフ文}
-\subsection{分類器}
-\section{評価実験}
-\subsection{評価指標}
+
+\begin{table}[ht]
+  \begin{center}
+  \caption{実験環境のスペック}
+  \label{ex-spec}
+  \begin{tabular}{|c|l|}
+    \hline
+     名称 & スペック \\ \hline \hline
+    マシン &  マウスコンピューター MASTERPIECE i1550PA7-CL-W7\\ \hline
+    OS &  CentOS Linux release 7.3.1611 (Core)\\ \hline
+    CPU & Intel Core i7-3970X 3.50GHz × 2 \\ \hline
+    メモリサイズ & 64.0GB \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
+
+本実験の実装環境は表\ref{ex-software}と\ref{ex-spec}に示したとおりである.
+この実験はプログラミング言語Python\cite{python}を用いて記述した。
+前処理の形態素解析にはMeCab\cite{mecab}を用い、これの辞書にはIPA辞書を用いた
+機械学習及び交差検証にはscikit-learn\cite{sklearn}を用いた。
+
+\section{評価}
 \subsection{交差検証}
-%TODO 用いたグリッドサーチの候補値
-%\subsection{グリッドサーチ}
+本研究では、交差検証手法の一つであるleave-one-out交差検証を行う。
+データーセットから１つのデータだけを抜き出して、テストデータとし、残りを学習データとする。
+これを、全データが一回ずつテストデータとなるように検証を繰り返す手法である。
 
+\subsection{評価指標}
+一般にクラス分類を行う分類器の性能を評価する指標として，適合率 (Precision)，再現率 (Recall)，F値(F-measure)が使用されている。
+本研究では特にF値に注目して評価を行う。
 
-
-\subsection{評価}
-本実験では，leave-one-out交差検証を行い，判定結果に対応する入力データの集合をTP，FP，TN，FNを次のように定義する．
+これらの定義について述べる。
 
 \begin{description}
    \item[True Positive(TP)] 実際の感情のものを実際の感情であると予測したものの件数
@@ -24,10 +57,6 @@
    \item[False Positive(FP)] 実際の感情でないものを実際の感情であると予測したものの件数
    \item[False Negative(FN)] 実際の感情のものを実際の感情でないと予測したものの件数
  \end{description}
-
-
-以上をふまえ，分類器の性能評価を式(1)，(2)，(3)，(4)で行う．
-本研究は分類推定を目的としているため特にF値(4)に注目する．
 
 \begin{eqnarray}
   正解率(Ac) =  \frac{TP + TN} {TP + TF + NP + NF}
@@ -45,8 +74,37 @@
   F値 =  \frac{2*Pr*Re}{Pr + Re}
 \end{eqnarray}
 
+また、本研究は多クラス分類に相当する。
+多クラス分類の評価指標としてマクロ平均とマイクロ平均がある。
+本研究では不均衡データを扱うためなるべく偏ったクラスの影響を少なくするために、マイクロ平均を用いた。
+すなわち、各クラスのF値を求めてそれらの平均を求めるのではなく、各クラスのTP、TN、FP、FNをそれぞれ合計した値を用いてF値を求める。
 
-\subsection{比較実験}
+
+\section{比較実験}
 提案手法の有効性を検証するために，同様な実験をセリフ文のみに絞った場合とさらに機能語に絞らなかった場合とそれぞれ行った．
-さらに，ランダムフォレストの比較としてSVMを用いた実験も行った．
-このとき，ランダムフォレストと同様にSVMでもグリットサーチで最適なパラメタを導出した．
+さらに，ランダムフォレストの比較としてSVMとナイーブベイズを用いた実験も行った．
+このとき，ランダムフォレストと同様にSVMについてもグリットサーチで最適なパラメタを導出した．
+
+\section{グリッドサーチで探索した値}
+グリッドサーチで探索した値を表\ref{parameters}に示す。
+なおF値のマクロ平均が最大になるようにグリッドサーチを行った。
+
+\begin{table}[H]
+ \centering
+  \caption{グリッドサーチで探索したパラメタ}
+  \vspace{0.3\baselineskip}
+     \scalebox{1}{
+  \begin{tabular}{|c|c|} \hline
+    重要度計算の尺度 & エントロピー、ジニ係数 \\ \hline
+    木の最大の深さ & 5, 10, 15, 20, 30, 40 \\ \hline
+    決定木の数 & 10, 30, 50, 100, 300 \\ \hline
+    特徴量の最大の数 & None, auto, sqrt \\ \hline
+    葉ノードの最少分割数 & 2, 5, 10, 20 \\ \hline
+    葉ノードの徴量の最小数 & 2, 3, 5, 8, 10, 12, 15 \\ \hline
+  \end{tabular}}
+  \label{parameters}
+\end{table}
+
+\section{本章のまとめ}
+本章では，提案手法の有効性を確認するための評価実験について説明した。
+まず、実験環境と評価方法について述べたあと、比較実験について説明し、最後に学習パラメタについて述べた。
