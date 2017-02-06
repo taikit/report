@@ -1,7 +1,8 @@
 \chapter{データセット}
 本章では実験に用いる教師データを収集するためのシステムや集計手法について説明する．
 教師データの作成手順を図\ref{fig:enquete}に示す．
-本研究では，まず物語文を元に各感情を指定した音声データを生成し，Webのアンケートシステムを用いて複数の被験者に評価してもらい，学習データを作成する．
+本研究には，文に対してどの感情表現で音声合成を行うべきかという，文と感情表現ラベルが対になった学習データが必要である．
+このために，物語文を元に各感情を指定した音声データを生成し，Webのアンケートシステムを用いて複数の評価者に評価してもらい，学習データを作成する．
 
 \begin{figure}[hb]
   \begin{center}
@@ -19,25 +20,29 @@
 
 \section{音声データの作成}
 \subsection{前処理}
-\ref{subsec:divide}で述べたように物語の文章を文に分ける．
-朗読システム実現するためにはこの処理も自動化する必要がある．
-また，青空文庫の書籍データにはルビや改行といったHTMLタグが挿入されているためこれを除く必要がある．
-プログラミング言語Rubyを用いて，これらの処理を実装した．
-これらの処理の例を\ref{fig:aozora-convert}に示す．
 
 \begin{figure}[hb]
   \begin{center}
-    \includegraphics[clip,width=16.0cm]{fig/aozora-convert.eps}
+    \includegraphics[clip,width=14.0cm]{fig/aozora-convert.eps}
     \caption{青空文庫データの文分割とタグ削除処理}
     \label{fig:aozora-convert}
   \end{center}
 \end{figure}
+
+
+\ref{subsec:divide}で述べたように物語の文章を文に分ける．
+朗読システム実現するためにはこの処理も自動化する必要がある．
+また，青空文庫の書籍データにはルビや改行といったHTMLタグが挿入されているためこれを除く必要がある．
+プログラミング言語Ruby\cite{ruby}を用いて，これらの処理を実装した．
+これらの処理の例を\ref{fig:aozora-convert}に示す．
 
 \subsection{音声合成ソフト}
 本研究では音声合成にオープンソフトのOpen JTalk\cite{jtalk}を用いる．
 Open Jtalkは日本語テキスト向けのHMM型の音声合成のオープンソースのソフトウェアである．
 \ref{hmm-emotion}で述べた通りHMM型音声合成手法は少ない学習データで感情表現が可能になっている．
 また，再現実験を考慮し広く利用が可能なオープンソースソフトウェアであるOpen Jtalkを用いた．
+
+%TODO バクについて
 
 
 音声波形データにはMMDAgent\cite{mei}にあるMeiのサンプルを用いた．
@@ -49,6 +54,21 @@ Open Jtalkは日本語テキスト向けのHMM型の音声合成のオープン�
 
 発音辞書にはNAIST Japanese Dictionary\cite{naist}を用いる．
 
+各ソフトウェアの仕様は表\ref{voice-software}に示す．
+\begin{table}[ht]
+  \begin{center}
+  \caption{音声合成のソフトウェア仕様}
+  \label{}
+  \begin{tabular}{|c|l|}
+    \hline
+    名称 & バージョン \\ \hline \hline
+    Open JTalk & 1.10 \\ \hline
+    NAIST Japanese Dictionary & 0.4.3  \\ \hline
+    MMDAgent & 1.7 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
+
 \subsection{音声データファイル}
 本研究では，前章のOpen JTalkとMeiの音声波形データ等を用いて，一つの文に対して4つの異なる感情表現の音声ファイルを生成する．
 この音声ファイルはWAVフォーマット形式で出力される．
@@ -58,9 +78,12 @@ Open JTalkの出力ではサンプルレートが48,000Hz，16bps，モノラル
 
 \section{アンケートシステム}
 
+本研究では効率よく学習データを採取するためにWeb上で文に対して感情のラベル付けが行えるシステムを構築した．
+
+\subsection{システムの概要}
 \begin{figure}[h]
   \begin{center}
-    \includegraphics[clip,width=14.0cm]{fig/web-index.eps}
+    \includegraphics[clip,width=13.0cm]{fig/web-index.eps}
     \caption{WEBアンケートシステム選択画面}
     \label{fig:index-web}
   \end{center}
@@ -73,17 +96,66 @@ Open JTalkの出力ではサンプルレートが48,000Hz，16bps，モノラル
     \label{fig:web}
   \end{center}
 \end{figure}
+サインアップもしくはログインを行い評価者は図\ref{fig:index-web}のインデックスページの評価ボタンがから図\ref{fig:web}に示す評価ページに遷移する．
+評価ページにおいて後述する評価アルゴリズムに基づいて自動選択された文について評価者は4つの音声それぞれを聞き，内容にもっとも適切(自然)であると思われる感情を１つだけ選択してもらう．
+評価ボタンをクリックすると評価はデータベースに保存され，自動選択された別の文の評価ページへと遷移する．
 
-本研究では効率よく学習データを採取するためにWeb上で文に対して感情のラベル付けが行えるシステムを構築した．
-そのシステム画面を図\ref{fig:index-web}と図\ref{fig:web}に示す．
+\subsection{システムの利用技術}
+WebアプリケーションフレームであるRuby on Rails\cite{rails}を採用し，データベースにはSQlite3\cite{sqlite}を用いた構築した．
 
-\subsection{評価}
-被験者には文ごとに各感情のパラメタで合成した音声をそれぞれ聞いてもらい内容にもっとも適切(自然)であると思われる感情を１つだけ選択してもらう．
-しかし，感情は主観的な尺度であるため一人だけの評価では信頼性が低い．
-そこで，一文に対して同じ感情の評価が二票集まった時点で，その文の感情を決定することとした．
-したがって，同じ感情の評価が二票あるまで他の被験者に評価し続けてもらう．
-被験者等に関する詳細を表\ref{enviroment}に示す．
-本システム用いたサーバー機とソフトウェアの仕様は\ref{server}に示す
+評価ページの音声再生部分にはHTML5に定められているWeb Audio APIとaudioタグによる2つの実装を行った．
+これは，評価者のブラウザ環境によってはどちらかが使えない場合があるからである．
+なお，Playボタンを押すとWeb Audio APIが呼び出されるがこの部分の実装にはJavaScriptを用いた．
+これにより，Open JTalkで生成されたWAVファイルが評価自身の端末で再生可能となった．
+
+また，得られた学習データはCSV形式で出力する機能も備えており実用的である．
+
+その他，本システム用いたサーバー機のスペックはソフトウェアの仕様\ref{software}に，表\ref{server}に示す
+
+\begin{table}[ht]
+  \begin{center}
+  \caption{アンケートシステムのソフトウェア仕様}
+  \label{software}
+  \begin{tabular}{|c|l|}
+    \hline
+    名称 & バージョン \\ \hline \hline
+    Ruby & 2.3.3p222 \\ \hline
+    Ruby on Rails & 4.2.7.1 \\ \hline
+    SQLite3 & 3.7.17 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
+
+\begin{table}[ht]
+  \begin{center}
+  \caption{アンケートシステムのサーバースペック}
+  \label{server}
+  \begin{tabular}{|c|l|}
+    \hline
+     名称 & スペック \\ \hline \hline
+    マシン &  マウスコンピューター MASTERPIECE i1550PA7-CL-W7\\ \hline
+    OS &  CentOS Linux release 7.3.1611 (Core)\\ \hline
+    CPU & Intel Core i7-3970X 3.50GHz × 2\\ \hline
+    メモリサイズ & 64.0GB \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
+
+
+
+\subsection{評価アルゴリズム}
+被験者には文ごとに各感情のパラメタで合成した音声をそれぞれ聞いてもらい，内容にもっとも適切(自然)であると思われる感情を１つだけ選択してもらう．
+しかし，感情は主観的な尺度であるため1人だけの評価では信頼性が低い．
+そこで，一文に対して同じ感情の評価が2票集まった時点で評価を確定することとした．
+異なる評価が集まった場合はもう1票だけ評価を続け，既存の評価と同じ感情であればその評価で確定することにした．
+３票ともに異なる評価が集まった場合には，その文は学習データとしては利用しないこととした．
+なお，セリフ文を優先的に評価するように設定した．
+
+
+\subsection{学習データの収集}
+大学生に自身が所有するPCやスマートフォンで，アンケートシステムにアクセスさせ，評価を行わせた．
+なお，評価の期限や数は評価者の任意とした．
+その他詳細は表\ref{enviroment}に示す．
 
 \begin{table}[ht]
   \begin{center}
@@ -100,23 +172,14 @@ Open JTalkの出力ではサンプルレートが48,000Hz，16bps，モノラル
 \end{table}
 
 
-\begin{table}[ht]
-  \begin{center}
-  \caption{アンケートシステムの仕様}
-  \label{server}
-  \begin{tabular}{|c|l|}
-    \hline
-    被験者 & 東京理科大学の学部生及び大学院生 \\ \hline
-    人数 & 学部生15名，大学院生2名 \\ \hline
-    取得期間 & 2017年1月9日〜25日 \\ \hline
-    評価取得数 & 2641 \\ \hline
-  \end{tabular}
-  \end{center}
-\end{table}
 
-\section{集計方法}
+\section{学習データの概要}
+学習データの概要を表\ref{sentence-count}と表\ref{emotion-count}に示す．
 
-\section{得られた学習データ}
+全体で評価が確定したものは全体で69.8\%であった．
+セリフは全体の33.21\%であり，セリフの評価完了率は81.04\%であった．
+表\ref{emotion-count}の通り，Normal以外の感情はセリフに多く含まれており，セリフの方が感情豊かであり，それ以後の文はNormalであることが多いことがわかる．
+
 \begin{table}[ht]
  \centering
   \caption{学習データ(物語別)}
@@ -152,11 +215,8 @@ Open JTalkの出力ではサンプルレートが48,000Hz，16bps，モノラル
   \label{emotion-count}
 \end{table}
 
-学習データの概要を表\ref{sentence-count}と表\ref{emotion-count}に示す．
-全体で評価が確定したものは全体で69.8\%であった．
-全文とセリフのみに絞った場合の比較を行う．
-得られた学習データは表\ref{emotion-count}の通り，Normal以外の感情はセリフに多く含まれることがわかる．
-したがってセリフの感情推定の精度を上げることで全体の精度をあげることができることがわかる．
-全文にくらべセリフのみを対象とした場合はより均等に感情が別れているため分類がより難しい．
+\section{本章のまとめ}
+本章では，本研究に用いるデータセットの説明や収集方法，アンケートシステムの詳細について説明した．
+
 
 
