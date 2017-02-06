@@ -1,9 +1,8 @@
 \chapter{提案手法}
-%TODO 直し
 本章では提案する手法の詳細について説明する.
-まず，提案手法全体の概要を示し，学習と推定の方法を述べる．
+まず，提案手法全体の概要を示し，前処理の具体的な手法や分類に使用する機械学習の手法について解説する．
 
-
+%TODO 分割
 \section{提案手法の概要}
 \begin{figure}[ht]
   \begin{center}
@@ -24,17 +23,18 @@
 
 \begin{figure}[ht]
   \begin{center}
-    \includegraphics[clip,width=12.0cm]{fig/method.eps}
+    \includegraphics[clip,width=13.0cm]{fig/method.eps}
     \caption{前処理の手順}
     \label{fig:pre}
   \end{center}
 \end{figure}
 
+機械学習で
 前処理の手法を順に追って説明する．
 その概要を図\ref{fig:pre}に示す．
 
 
-\subsection{文分割}
+\subsection{文の分割}\label{subsec:divide}
 本手法では文単位で感情の推定を行う．
 それゆえ，物語の文章を文に分ける必要がある．
 意味内容を解読しそれにしたがって分割した方が自然な読み上げが可能になる可能性はあるが，朗読システムの構築を考えると単純な分割が好ましいと判断した．

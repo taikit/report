@@ -1,58 +1,83 @@
-\chapter{実験}
+\chapter{データセット}
+本章では実験に用いる教師データを収集するためのシステムや集計手法について説明する．
+教師データの作成手順を図\ref{fig:enquete}に示す．
+本研究では，まず物語文を元に各感情を指定した音声データを生成し，Webのアンケートシステムを用いて複数の被験者に評価してもらい，学習データを作成する．
 
-\section{正解データの作成}
-\subsection{WEBアンケートシステム}
-
-\section{実験環境}
-\section{比較実験}
-\subsection{セリフ文}
-\subsection{分類器}
-\section{評価実験}
-\subsection{評価指標}
-\subsection{交差検証}
-
-
-本実験の概要を図\ref{fig:enquete}に示す．
-本実験では，まず物語文を元に各感情を指定した音声データを生成し，Webのアンケートシステムを用いて複数の被験者に評価してもらい，学習データを作成する．
-その後，学習データを用い交差検証を行う．
-
-\begin{figure}[ht]
+\begin{figure}[hb]
   \begin{center}
-    \includegraphics[clip,width=7.0cm]{fig/enquete.eps}
+    \includegraphics[clip,width=10.0cm]{fig/enquete.eps}
     \caption{学習データの作成手順}
     \label{fig:enquete}
   \end{center}
 \end{figure}
 
-\subsection{データの作成}
-提案手法で述べた通り物語データを文に区切り，一文につきそれぞれ4種類の感情を指定して音声データを生成する．
-
+\section{物語文章}
 本実験では物語データとして，青空文庫\cite{aozora}にある5つの物語を用いる．
+青空文庫とは，著作権が消滅した作品や著者が許諾した作品のテキストを公開しているインターネット上の電子図書館である
 今回は文体を近づけるために同じ訳者の童話を中心に「白雪姫」,「赤ずきんちゃん」,「浦島太郎」,「ジャックと豆の木」,「ヘンゼルとグレーテル」を用いた．
-なお，ルビのデータが含まれているため予めタグを除いておく．
+%TODO 著者などを添えた表
 
-本研究の音声合成にはオープンソフトのOpen JTalk\cite{jtalk}を用いる．
-Open JTalk は形態素解析部に MeCab\cite{mecab}，発音辞書に NAIST Japanese Dictienary\cite{naist}を用いてる．
-波形生成部にはMMDAgent\cite{mei}にあるMeiのサンプルを用いてる．
-NOMAL，HAPPY，ANGRY, BASHFUL,SADの5種類のサンプルがあるが，先行研究に従いこの内のBASHFULを除いた4種類を用いた．
-なお，音声データはWAVE形式として保存される．
+\section{音声データの作成}
+\subsection{前処理}
+\ref{subsec:divide}で述べたように物語の文章を文に分ける．
+朗読システム実現するためにはこの処理も自動化する必要がある．
+また，青空文庫の書籍データにはルビや改行といったHTMLタグが挿入されているためこれを除く必要がある．
+プログラミング言語Rubyを用いて，これらの処理を実装した．
+これらの処理の例を\ref{fig:aozora-convert}に示す．
+
+\begin{figure}[hb]
+  \begin{center}
+    \includegraphics[clip,width=16.0cm]{fig/aozora-convert.eps}
+    \caption{青空文庫データの文分割とタグ削除処理}
+    \label{fig:aozora-convert}
+  \end{center}
+\end{figure}
+
+\subsection{音声合成ソフト}
+本研究では音声合成にオープンソフトのOpen JTalk\cite{jtalk}を用いる．
+Open Jtalkは日本語テキスト向けのHMM型の音声合成のオープンソースのソフトウェアである．
+\ref{hmm-emotion}で述べた通りHMM型音声合成手法は少ない学習データで感情表現が可能になっている．
+また，再現実験を考慮し広く利用が可能なオープンソースソフトウェアであるOpen Jtalkを用いた．
+
+
+音声波形データにはMMDAgent\cite{mei}にあるMeiのサンプルを用いた．
+この音声波形データは１人の女性の848文の音声サンプルをもとに作成されている．
+そのうち，503文は音声波形作成に広く用いられている用いられるATR音素バランス503文\cite{atr}であり，残りのうち215文は普通の発話スタイルで，残る75文は４つの感情(Angry, Bashful, Happy, Sad)の発話スタイルで収録されている．
+それゆえ，MMDAgentにはNormal, Angry, Bashful, Happy, Sadの５つの音声波形データが用意されている．
+本研究では布目ら\cite{fume}などの研究に従い，このうちのNormal, Angry, Happy, Sadの４つを利用した．
+
+
+発音辞書にはNAIST Japanese Dictionary\cite{naist}を用いる．
+
+\subsection{音声データファイル}
+本研究では，前章のOpen JTalkとMeiの音声波形データ等を用いて，一つの文に対して4つの異なる感情表現の音声ファイルを生成する．
+この音声ファイルはWAVフォーマット形式で出力される．
+WAVフォーマット形式は，非圧縮形式でありリニアPCMのサンプリングデータ用のフォーマットとして扱われる．
+Open JTalkの出力ではサンプルレートが48,000Hz，16bps，モノラルのWAVファイルが得られる．
+%TODO ↑表にする？？
+
+\section{アンケートシステム}
 
 \subsection{学習データの収集}
-\begin{figure}[ht]
+\begin{figure}[h]
   \begin{center}
-    \includegraphics[clip,width=7.0cm]{fig/web.eps}
+    \includegraphics[clip,width=10.0cm]{fig/web.eps}
     \caption{WEBアンケートシステム画面}
     \label{fig:web}
   \end{center}
 \end{figure}
 
-Web上で学習データを収集するためのシステムを構築した．
+本研究ではWeb上で学習データを収集するためのシステムを構築した．
 そのシステム画面を図\ref{fig:web}に示す．
+
+\subsection{}
+\subsection{評価}
 被験者には文ごとに各感情のパラメタで合成した音声をそれぞれ聞いてもらい内容にもっとも適切(自然)であると思われる感情を１つだけ選択してもらう．
 しかし，感情は主観的な尺度であるため一人だけの評価では信頼性が低い．
 そこで，一文に対して同じ感情の評価が二票集まった時点で，その文の感情を決定することとした．
 したがって，同じ感情の評価が二票あるまで他の被験者に評価し続けてもらう．
 被験者等に関する詳細を表\ref{enviroment}に示す．
+本システム用いたサーバー機とソフトウェアの仕様は\ref{server}に示す
 
 \begin{table}[ht]
   \begin{center}
@@ -68,38 +93,64 @@ Web上で学習データを収集するためのシステムを構築した．
   \end{center}
 \end{table}
 
-\subsection{評価}
-本実験では，leave-one-out交差検証を行い，判定結果に対応する入力データの集合をTP，FP，TN，FNを次のように定義する．
 
-\begin{description}
-   \item[True Positive(TP)] 実際の感情のものを実際の感情であると予測したものの件数
-   \item[True Negative(TN)] 実際の感情でないものをその感情でないと予測したものの件数
-   \item[False Positive(FP)] 実際の感情でないものを実際の感情であると予測したものの件数
-   \item[False Negative(FN)] 実際の感情のものを実際の感情でないと予測したものの件数
- \end{description}
+\begin{table}[ht]
+  \begin{center}
+  \caption{アンケートシステムの仕様}
+  \label{server}
+  \begin{tabular}{|c|l|}
+    \hline
+    被験者 & 東京理科大学の学部生及び大学院生 \\ \hline
+    人数 & 学部生15名，大学院生2名 \\ \hline
+    取得期間 & 2017年1月9日〜25日 \\ \hline
+    評価取得数 & 2641 \\ \hline
+  \end{tabular}
+  \end{center}
+\end{table}
+
+\section{集計方法}
+
+\section{得られた学習データ}
+\begin{table}[ht]
+ \centering
+  \caption{学習データ(物語別)}
+  \vspace{0.3\baselineskip}
+  \scalebox{0.8}{
+  \begin{tabular}{|c|c|c|} \hline
+    タイトル & 文数(セリフ) & 評価確定数(セリフ) \\ \hline \hline
+    白雪姫 & 287 (90) & 258 (86)   \\ \hline
+    赤ずきんちゃん & 109 (54) & 108 (54)   \\ \hline
+    浦島太郎 & 206 (48) & 78 (26)   \\ \hline
+    ジャックと豆の木 & 206 (49) & 78 (26)   \\ \hline
+    ヘンゼルとグレーテル & 319 (114) & 260 (90)   \\ \hline\hline
+    合計 & 1096 (364) & 765 (283) \\ \hline
+  \end{tabular}
+  }
+  \label{sentence-count}
+\end{table}
+
+\begin{table}[ht]
+ \centering
+  \caption{学習データ(感情別)}
+  \vspace{0.3\baselineskip}
+  \scalebox{0.90}{
+  \begin{tabular}{|c|c|c|} \hline
+    感情 & 全文 & セリフのみ  \\ \hline \hline
+    Normal & 459  & 63  \\ \hline
+    Happy & 134 & 110 \\ \hline
+    Sad & 99  & 60  \\ \hline
+    Angry & 73  & 50  \\ \hline \hline
+    合計 & 765 &  283 \\ \hline
+  \end{tabular}
+  }
+  \label{emotion-count}
+\end{table}
+
+学習データの概要を表\ref{sentence-count}と表\ref{emotion-count}に示す．
+全体で評価が確定したものは全体で69.8\%であった．
+全文とセリフのみに絞った場合の比較を行う．
+得られた学習データは表\ref{emotion-count}の通り，Normal以外の感情はセリフに多く含まれることがわかる．
+したがってセリフの感情推定の精度を上げることで全体の精度をあげることができることがわかる．
+全文にくらべセリフのみを対象とした場合はより均等に感情が別れているため分類がより難しい．
 
 
-以上をふまえ，分類器の性能評価を式(1)，(2)，(3)，(4)で行う．
-本研究は分類推定を目的としているため特にF値(4)に注目する．
-
-\begin{eqnarray}
-  正解率(Ac) =  \frac{TP + TN} {TP + TF + NP + NF}
-\end{eqnarray}
-
-\begin{eqnarray}
-  適合率（Pr） = \frac{TP} {TP + FP}
-\end{eqnarray}
-
-\begin{eqnarray}
-  再現率（Re） =  \frac{TP} {TP + FN}
-\end{eqnarray}
-
-\begin{eqnarray}
-  F値 =  \frac{2*Pr*Re}{Pr + Re}
-\end{eqnarray}
-
-
-\subsection{比較実験}
-提案手法の有効性を検証するために，同様な実験をセリフ文のみに絞った場合とさらに機能語に絞らなかった場合とそれぞれ行った．
-さらに，ランダムフォレストの比較としてSVMを用いた実験も行った．
-このとき，ランダムフォレストと同様にSVMでもグリットサーチで最適なパラメタを導出した．
