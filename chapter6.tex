@@ -1,7 +1,5 @@
 \chapter{結果と考察}
-
-%TODO F値最適の結果
-%TODO 説明も増やす
+本章では，グリッドサーチの結果と各比較実験の結果を示し、それを踏まえて考察を行う。
 \section{結果}
 
 \subsection{グリッドサーチ}
@@ -11,13 +9,13 @@
   \vspace{0.3\baselineskip}
      \scalebox{0.75}{
   \begin{tabular}{|c|c|c|c|c|} \hline
-  パラメタ名 & 全文 & \shortstack{全文\\(機能語のみ)} & セリフ & \shortstack{セリフ\\(機能語のみ)}\\ \hline \hline
+  パラメタ & 全文 & \shortstack{全文\\(機能語のみ)} & セリフ & \shortstack{セリフ\\(機能語のみ)}\\ \hline \hline
   ceriterion & entropy & entropy & entropy & entropy\\ \hline
-  min\_samples\_leaf & 12 & 8 & 3 & 8\\ \hline
-  n\_estimators & 80 & 250 & 30 & 30\\ \hline
-  max\_features & None & None & None & None\\ \hline
-  min\_samples\_split & 12 & 10 & 3 & 10\\ \hline
- max\_depth & 17 & 20 & 20 & 15\\ \hline
+  min\_samples\_leaf & 10 & 12 & 2 & 2\\ \hline
+  n\_estimators & 100 & 50 & 30 & 10\\ \hline
+  max\_features & None & None & sqrt & sqrt\\ \hline
+  min\_samples\_split & 5 & 5 & 2 & 5\\ \hline
+  max\_depth & 10 & 30 & 40 & 40\\ \hline
   \end{tabular}}
   \label{gs-rf}
 \end{table}
@@ -28,10 +26,10 @@
   \vspace{0.3\baselineskip}
      \scalebox{0.8}{
   \begin{tabular}{|c|c|c|c|c|} \hline
-  パラメタ名 & 全文 & \shortstack{全文\\(機能語のみ)} & セリフ & \shortstack{セリフ\\(機能語のみ)}\\ \hline \hline
+  パラメタ & 全文 & \shortstack{全文\\(機能語のみ)} & セリフ & \shortstack{セリフ\\(機能語のみ)}\\ \hline \hline
   kernel & sigmoid & sigmoid & poly & rbf\\ \hline
-  gamma & 0.001 & 0.001 & 3 & 0.001\\ \hline
-  C & 100 & 100 & 1000 & 1\\ \hline
+  gamma & 0.001 & 0.001 & 0.01 & 0.0001\\ \hline
+  C & 100 & 100 & 1000 & 1000\\ \hline
   \end{tabular}}
   \label{gs-svm}
 \end{table}
@@ -39,24 +37,25 @@
 グリッドサーチの結果を表\ref{gs-rf}表と表\ref{gs-svm}に示す．
 それぞれの場合で値が大きく異なるパラーメタが得られる場合があった．
 
+
 \subsection{評価結果}
-\begin{table}[ht]
+\begin{table}[H]
  \centering
   \caption{ランダムフォレストでの結果}
   \vspace{0.3\baselineskip}
   \scalebox{0.9}{
   \begin{tabular}{|l|c|c|c|c|} \hline
     対象 & 正確度 & 適合率 & 再現率 & F値  \\ \hline \hline
-    全文 & 0.82 & 0.57 & 0.64 & 0.57  \\ \hline
-    全文(機能語) & 0.82 & 0.54 & 0.64 & 0.57   \\ \hline
-    セリフのみ & 0.70 & 0.37 & 0.40 & 0.37   \\ \hline
-    セリフのみ(機能語) & 0.70 & 0.35 & 0.40 & 0.34  \\ \hline
+    全文 & 0.82 & 0.65 & 0.65 & 0.65 \\ \hline
+    全文(機能語) & 0.82 & 0.65 & 0.65 & 0.65\\ \hline
+    セリフのみ & 0.68 & 0.36 & 0.36 & 0.36 \\ \hline
+    セリフのみ(機能語) & 0.68 & 0.37 & 0.37 & 0.37 \\ \hline
   \end{tabular}
   }
   \label{res-rf}
 \end{table}
 
-\begin{table}[ht]
+\begin{table}[H]
  \centering
   \caption{SVMでの結果}
   \vspace{0.3\baselineskip}
@@ -72,28 +71,51 @@
   \label{res-svm}
 \end{table}
 
-ランダムフォレストとSVMの結果を表\ref{res-rf}と表\ref{res-svm}に示す．
-なお(機能語)とは学習，推定時に機能語のみを用いた場合を示す．
+\begin{table}[H]
+ \centering
+  \caption{ナイーブベイズでの結果}
+  \vspace{0.3\baselineskip}
+  \scalebox{0.9}{
+  \begin{tabular}{|l|c|c|c|c|} \hline
+    対象 & 正確度 & 適合率 & 再現率 & F値  \\ \hline \hline
+    全文 & 0.81 & 0.63 & 0.63 & 0.63 \\ \hline
+    全文(機能語) & 0.82 & 0.64 & 0.64 & 0.64 \\  \hline
+    セリフ & 0.69 & 0.38 & 0.38 & 0.38 \\ \hline
+    セリフ(機能語) & 0.69 & 0.37 & 0.37 & 0.37 \\ \hline
+  \end{tabular}
+  }
+  \label{res-nb}
+\end{table}
+
+ランダムフォレストとSVM及びナイーブベイズでの結果を表\ref{res-rf}と表\ref{res-svm}及び\ref{res-nb}に示す．
+なお、(機能語)とは学習や推定時に機能語のみを用いた場合を示す．
 全体としてF値は高くない結果となった．
 特にSVMの場合はSVMでは，全文に機能語を絞らずに分類を行った場合を除く他のすべての場合で，推定が一つの感情に偏ってしまった．
+ランダムフォレストとナイーブベイズでは全体としてわずかながらランダムフォレストにの方がよい結果が得られた。
+しかし、セリフにおいてはナイーブベイズがランダムフォレストを上回った。
+
+%TODO confusion matrix
 
 \section{考察}
 全体としてのF値は高くない結果となった．
-原因として学習データが少ないことや出現を示すベクトルの形式に問題がある可能性がある．
-また，グリットサーチを正確度を基準に行ってしまったためF値を基準にやり直す必要がある．
+原因として学習データが少ないことや出現を示すベクトルの形式(bag-of-words)に問題がある可能性がある．
 
-ランダムフォレストとSVMを比較する．
+機械学習の手法を比較する．
 SVMでは，全文に機能語を絞らずに分類を行った場合を除く他のすべての場合で，推定が一つの感情に偏ってしまった．
+したがってSVMは本研究にふさわしくない可能性が高い。
+また、わずかながらナイーブベイズよりランダムフォレストの方が良い結果を示した。
 したがって，本研究の目的のためにはSVMよりランダムフォレストの方が有用であると言える．
 
 機能語に絞った場合ととそうでない場合を比較する．
-ランダムフォレストの値ではほぼ同じもしくは機能語に絞らない方がわずかに良い結果が得られている．
-これは，学習データに用いた物語が５つと少ないことやleave-one-outを用いたことで推定する文と同じ物語の文を用いて学習を行っているからであると考えられる．
-したがって，機能語だけでも感情の推定を行える可能性はまだある．
+ランダムフォレストの値ではほとんど同じF値を得た。
+本実験では学習データに用いた物語が５つと少ないことに加えleave-one-outを用いたことで推定する文と同じ物語の文を用いて学習・推定を行っているため、内容語・機能語の両方を使った推定では内容に依存した語を用いて推定を行っている可能性がある。
+したがって、機能語だけでも推定が行える可能を示せたと考えられる。
 実際の運用では未知の物語の文に対して推定を行うので，機能語だけの学習・推定の方が精度が高い推定が行えるかもしれない．
-この検証を行うためには物語数を増やし学習データを増やした上で，leave-one-outではなく一つの物語をテストデータして他の物語を学習データとして検証を行う必要がある．
-また，決定木を用いて各単語の重要度を算出することで，機能語が感情推定にどれほど寄与するのか確認することができる．
 
+
+
+\section{本章のまとめ}
+本章では，グリッドサーチの結果と各比較実験の結果を示し、それを踏まえて考察を行った。
 
 %全体で評価が確定したものは全体で69.8\%であった．
 %全文とセリフのみに絞った場合の比較を行う．
