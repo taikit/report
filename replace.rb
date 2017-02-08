@@ -1,5 +1,5 @@
 begin
-  s = File.read(ARGV[0])
+  s = File.read(ARGV[0], encoding: 'utf-8')
   s.gsub!('、', '，')
   s.gsub!('。', '．')
   File.open(ARGV[0], 'w') do |f|
